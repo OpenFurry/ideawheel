@@ -17,6 +17,10 @@ def login():
 def logout():
     pass
 
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    pass
+
 @app.route('/idea')
 def random_idea():
     """Random Idea
@@ -43,7 +47,7 @@ def read_idea(idea_id):
 def pin_idea(idea_id):
     """ Pin Idea
     
-    Pin an idea so that idea snippets can be strung together into somethign
+    Pin an idea so that idea snippets can be strung together into something
     coherent."""
     pass
 
