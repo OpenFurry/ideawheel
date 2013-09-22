@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Login - {% endblock %}
+{% block header %}Login{% endblock %}
+{% block body %}
+    <section>
+        <form method="post" action="{{ url_for('login') }}">
+            <label for="username">Username:</label> <input type="text" name="username" size="30" maxlength="60" /><br />
+            <label for="password">Password:</label> <input type="password" name="password" size="30" maxlength="60" /><br />
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}" />
+            {% endif %}
+            <input type="submit" value="Login" />
+        </form>
+        <p>Not a member yet? <a href="{{ url_for('register') }}">Register!</a></p>
+    </section>
+{% endblock %}
