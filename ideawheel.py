@@ -1,9 +1,22 @@
-import datetime, hashlib, os, random, sqlite3, sys
+import datetime, hashlib, inspect, os, random, sqlite3, sys
 
-from flask import Flask, abort, flash, g, redirect, render_template, request, session
+from flask import (
+        Flask, 
+        abort, 
+        flash, 
+        g, 
+        redirect, 
+        render_template, 
+        request, 
+        session
+)
 
 # Configuration
-DATABASE = 'ideawheel.db'
+DATABASE = os.path.join(
+        os.path.dirname(
+            os.path.abspath(
+                inspect.getfile(inspect.currentframe()))), 
+        'ideawheel.db')
 SECRET_KEY = os.urandom(12)
 DEBUG = True
 
