@@ -8,7 +8,7 @@ create table auth_users (
 	display_name text default '',
 	blurb text default '',
 	artist_type text default 'thinker of grand ideas',
-    user_type integer default 0
+	user_type integer default 0
 );
 create unique index user_login_idx ON auth_users(username, salt, hashword);
 

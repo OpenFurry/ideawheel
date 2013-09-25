@@ -17,7 +17,6 @@ class User:
     """User
 
     An object representing a user."""
-
     def __init__(self, username = None, email = None, display_name = None,
             blurb = None, artist_type = None, user_type = None):
         self.loaded = False
@@ -42,6 +41,7 @@ class User:
         return None
 
 def get_user(username):
+    """Return a populated User object, given a username."""
     result = g.db.execute('select email, display_name, blurb, artist_type, '
             'user_type from auth_users where username = ?',
             [username])
@@ -51,22 +51,17 @@ def get_user(username):
     return User(username = username, email = row[0], display_name = row[1],
             blurb = row[2], artist_type = row[3], user_type = row[4])
 
-
-mod = Blueprint('user_management', __name__)
-
-@mod.route('/login', methods = ['GET', 'POST'])
-def login():
-    next_url = request.form.get('next', request.args.get('next', '/'))
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if check_password(username, password):
-            _login(username)
-            return redirect(next_url)
-        flash('Incorrect username or password.')
-    return render_template('user_management/login.html', next_url=next_url)
+def generate_hashword(password, salt = None):
+    """Generate salt and password hash for a password and optional salt."""
+    if salt is None:
+        salt = os.urandom(64)
+    return salt, scrypt.hash(password.encode('utf8'), salt)
 
 def check_password(username, password):
+    """Check Password
+    
+    For a given username and password, check if the given password matches the
+    one stored in the database for the given user."""
     result = g.db.execute(
             'select salt, hashword from auth_users where username = ?',
             [username])
@@ -105,8 +100,24 @@ def is_equal_time_independent(a, b):
     return result == 0
 
 def _login(username):
+    """Log in for the session"""
     session['logged_in'] = True
     session['username'] = username
+
+
+mod = Blueprint('user_management', __name__)
+
+@mod.route('/login', methods = ['GET', 'POST'])
+def login():
+    next_url = request.form.get('next', request.args.get('next', '/'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if check_password(username, password):
+            _login(username)
+            return redirect(next_url)
+        flash('Incorrect username or password.')
+    return render_template('user_management/login.html', next_url=next_url)
 
 @mod.route('/logout')
 def logout():
@@ -149,11 +160,6 @@ def register():
             return redirect('/')
     return render_template('user_management/register.html')
 
-def generate_hashword(password, salt = None):
-    if salt is None:
-        salt = os.urandom(64)
-    return salt, scrypt.hash(password.encode('utf8'), salt)
-
 @mod.route('/user/<username>')
 def show_user(username):
     """Show User
@@ -167,22 +173,31 @@ def edit_user(username):
     """Edit User
 
     Edit a user profile"""
+    # Permission denied unless the user's editing themselves, or it's an admin.
     if (not session.get('logged_in', False) and (session['username'] != username
             or not g.current_user.is_admin())):
         abort(403)
+
     user = get_user(username)
     if request.method == 'POST':
+        # Update the user with new fields so that form repopulates changed data.
         user.display_name = request.form['display_name']
         user.blurb = request.form['blurb']
         user.artist_type = request.form['artist_type']
         if 'user_type' in request.form:
             user.user_type = int(request.form['user_type'])
+
+        # Allow password/email editing if it's the current user.
         if g.current_user.username == user.username:
+            # Check old password.
             if (not request.form['password'] or not
                     check_password(user.username, request.form['password'])):
                 abort(403)
-            email = request.form['email']
+            user.email = request.form['email']
             new_password = request.form['new_password']
+
+            # Set new password if it was provided and matches confirmation;
+            # otherwise, just set the email.
             if new_password:
                 if new_password != request.form['new_password2']:
                     flash('New password and confirmation mismatch.')
@@ -194,11 +209,13 @@ def edit_user(username):
                         'email = ? where username = ?', 
                         [base64.b64encode(salt), 
                          base64.b64encode(hashword), 
-                         email, 
+                         user.email, 
                          username])
             else:
                 g.db.execute('update auth_users set email = ? where '
-                        'username = ?', [email, username])
+                        'username = ?', [user.email, username])
+
+        # Set the remainder of the fields and commit.
         g.db.execute('update auth_users set display_name = ?, blurb = ?, '
                 'user_type = ?, artist_type = ? where username = ?',
                 [user.display_name, user.blurb, user.user_type,
