@@ -1,5 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ user.display_name }}{% endblock %}
+{% block title %}
+    {% if user.display_name %}
+        {{ user.display_name }}
+    {% else %}
+        ~{{ user.username }}
+    {% endif %} -
+{% endblock %}
 {% block header %}
     {% if user.display_name %}
         {{ user.display_name }}
@@ -15,5 +21,11 @@
     <p><a href="{{ url_for('user_management.edit_user', username = user.username) }}">Edit user information</a></p>
 {% endif %}
 <p>{{ user.blurb }}</p>
+
+<p>TODO: Here is where the user's ideas will go</p>
+
+{% if user.username == session.username or g.current_user.is_admin() %}
+    <p>TODO: Here is where the user's pinned stubs will go</p>
+{% endif %}
 
 {% endblock %}

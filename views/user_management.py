@@ -60,19 +60,24 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        result = g.db.execute(
-                'select salt, hashword from auth_users where username = ?',
-                [username])
-        row = result.fetchone()
-        if row:
-            stored_hash = base64.b64decode(row[1])
-            stored_salt = base64.b64decode(row[0])
-            computed_hash = scrypt.hash(password.encode('utf8'), stored_salt)
-            if is_equal_time_independent(stored_hash, computed_hash):
-                _login(username)
-                return redirect(next_url)
+        if check_password(username, password):
+            _login(username)
+            return redirect(next_url)
         flash('Incorrect username or password.')
     return render_template('user_management/login.html', next_url=next_url)
+
+def check_password(username, password):
+    result = g.db.execute(
+            'select salt, hashword from auth_users where username = ?',
+            [username])
+    row = result.fetchone()
+    if row:
+        stored_hash = base64.b64decode(row[1])
+        stored_salt = base64.b64decode(row[0])
+        computed_hash = generate_hashword(password, salt = stored_salt)[1]
+        if is_equal_time_independent(stored_hash, computed_hash):
+            return True
+    return False
 
 def is_equal_time_independent(a, b):
     """Determine if two strings are equal in constant time.
@@ -121,6 +126,7 @@ def register():
             username = request.form['username']
             password = request.form['password']
             email = request.form['email']
+            # TODO validate/confirm email - #29 - Makyo
             result = g.db.execute('select count(*) from auth_users where '
                     'username = ? or email = ?', [username, email])
             if result.fetchone()[0] != 0:
@@ -129,8 +135,7 @@ def register():
                 return render_template('user_management/register.html')
             # 64 bytes of salt since our hash is 64 bytes long; perhaps
             # overkill but shouldn't take too long to generate
-            salt = os.urandom(64)
-            hashword = scrypt.hash(password.encode('utf8'), salt)
+            salt, hashword = generate_hashword(password)
             g.db.execute(
                     'insert into auth_users (username, hashword, salt, email) '
                     'values (?, ?, ?, ?)',
@@ -143,6 +148,11 @@ def register():
             flash('Thank you for registering! You are now logged in.')
             return redirect('/')
     return render_template('user_management/register.html')
+
+def generate_hashword(password, salt = None):
+    if salt is None:
+        salt = os.urandom(64)
+    return salt, scrypt.hash(password.encode('utf8'), salt)
 
 @mod.route('/user/<username>')
 def show_user(username):
@@ -162,9 +172,37 @@ def edit_user(username):
         abort(403)
     user = get_user(username)
     if request.method == 'POST':
+        user.display_name = request.form['display_name']
+        user.blurb = request.form['blurb']
+        user.artist_type = request.form['artist_type']
+        if 'user_type' in request.form:
+            user.user_type = int(request.form['user_type'])
         if g.current_user.username == user.username:
-            # check password
-            # set password, email separately if need be
-        # update other fields
+            if (not request.form['password'] or not
+                    check_password(user.username, request.form['password'])):
+                abort(403)
+            email = request.form['email']
+            new_password = request.form['new_password']
+            if new_password:
+                if new_password != request.form['new_password2']:
+                    flash('New password and confirmation mismatch.')
+                    return render_template('user_management/edit_user.html', 
+                            user = user)
+                # TODO validate/confirm email - #29 - Makyo
+                salt, hashword = generate_hashword(new_password)
+                g.db.execute('update auth_users set salt = ?, hashword = ?, '
+                        'email = ? where username = ?', 
+                        [base64.b64encode(salt), 
+                         base64.b64encode(hashword), 
+                         email, 
+                         username])
+            else:
+                g.db.execute('update auth_users set email = ? where '
+                        'username = ?', [email])
+        g.db.execute('update auth_users set display_name = ?, blurb = ?, '
+                'user_type = ?, artist_type = ? where username = ?',
+                [user.display_name, user.blurb, user.user_type,
+                    user.artist_type, user.username])
+        g.db.commit()
         return redirect(url_for('.show_user', username = username))
     return render_template('user_management/edit_user.html', user = user)
