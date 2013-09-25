@@ -1,4 +1,4 @@
-import hashlib, random
+import scrypt, random, base64, os
 
 from flask import (
         abort,
@@ -65,8 +65,9 @@ def login():
                 [username])
         row = result.fetchone()
         if row:
-            stored_hash = row[1]
-            computed_hash = hashlib.sha1(unicode(row[0]) + password).hexdigest()
+            stored_hash = base64.b64decode(row[1])
+            stored_salt = base64.b64decode(row[0])
+            computed_hash = scrypt.hash(password.encode('utf8'), stored_salt)
             if is_equal_time_independent(stored_hash, computed_hash):
                 _login(username)
                 return redirect(next_url)
@@ -126,12 +127,17 @@ def register():
                 flash('That username or email is already in use. Perhaps you '
                       'want to login instead?')
                 return render_template('user_management/register.html')
-            salt = random.randint(1000, 9999)
-            hashword = hashlib.sha1(unicode(salt) + password).hexdigest()
+            # 64 bytes of salt since our hash is 64 bytes long; perhaps
+            # overkill but shouldn't take too long to generate
+            salt = os.urandom(64)
+            hashword = scrypt.hash(password.encode('utf8'), salt)
             g.db.execute(
                     'insert into auth_users (username, hashword, salt, email) '
                     'values (?, ?, ?, ?)',
-                    [username, hashword, salt, email])
+                    [username,
+                     base64.b64encode(hashword),
+                     base64.b64encode(salt),
+                     email])
             g.db.commit()
             _login(username)
             flash('Thank you for registering! You are now logged in.')
