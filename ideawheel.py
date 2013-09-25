@@ -72,11 +72,38 @@ def login():
                 [username])
         row = result.fetchone()
         if row:
-            if hashlib.sha1(unicode(row[0]) + password).hexdigest() == row[1]:
+            stored_hash = row[1]
+            computed_hash = hashlib.sha1(unicode(row[0]) + password).hexdigest()
+            if is_equal_time_independent(stored_hash, computed_hash):
                 _login(username)
                 return redirect(next_url)
         flash('Incorrect username or password.')
     return render_template('login.html', next_url=next_url)
+
+def is_equal_time_independent(a, b):
+    """Determine if two strings are equal in constant time.
+
+    Normally we're quite happy if string equality comparisons early out on
+    the first mismatch. However, when we use compare security-sensitive data
+    like password hashes, breaking early can expose timing attacks which help
+    leak information about what a valid hash would be.
+
+    For more information on this class of attacks, see, for example:
+    http://codahale.com/a-lesson-in-timing-attacks/
+    http://rdist.root.org/2010/01/07/timing-independent-array-comparison/
+    http://www.cs.rice.edu/~dwallach/pub/crosby-timing2009.pdf
+    """
+    # Implementation is per Nate Lawson's timing-independent compare
+    # suggestion for Keyzar, available here:
+    # https://groups.google.com/forum/#!topic/keyczar-discuss/VXHsoJSLKhM
+    if len(a) != len(b):
+        return False
+
+    result = 0
+    for x, y in zip (a, b):
+        result |= ord(x) ^ ord(y)
+
+    return result == 0
 
 def _login(username):
     session['logged_in'] = True
