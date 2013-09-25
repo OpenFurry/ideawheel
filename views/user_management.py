@@ -100,12 +100,12 @@ def is_equal_time_independent(a, b):
 
 def _login(username):
     session['logged_in'] = True
-    session['user'] = get_user(username)
+    session['username'] = username
 
 @mod.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    session.pop('user', None)
+    session.pop('username', None)
     flash('Successfully logged out')
     return redirect('/')
 
@@ -151,10 +151,14 @@ def edit_user(username):
     """Edit User
 
     Edit a user profile"""
-    if (not session.get('logged_in', False) or session['user'].username != username
-            or not session['user'].is_admin()):
+    if (not session.get('logged_in', False) and (session['username'] != username
+            or not g.current_user.is_admin())):
         abort(403)
     user = get_user(username)
     if request.method == 'POST':
+        if g.current_user.username == user.username:
+            # check password
+            # set password, email separately if need be
+        # update other fields
         return redirect(url_for('.show_user', username = username))
     return render_template('user_management/edit_user.html', user = user)

@@ -9,7 +9,7 @@
             <h2>{% block header %}{% endblock %}</h2>
             <div class="usermgmt">
                 {% if session.logged_in %}
-                Logged in as <a href="{{ url_for('user_management.show_user', username=session.user.username) }}">{{ session.user.username }}</a> | <a href="{{ url_for('user_management.logout') }}">Logout</a>
+                Logged in as <a href="{{ url_for('user_management.show_user', username=session.username) }}">{{ session.username }}</a> | <a href="{{ url_for('user_management.logout') }}">Logout</a>
                 {% else %}
                 <a href="{{ url_for('user_management.login') }}">Login</a> | <a href="{{ url_for('user_management.register') }}">Register</a>
                 {% endif %}

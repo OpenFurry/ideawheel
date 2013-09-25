@@ -41,6 +41,9 @@ def init_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
+    if 'username' in session:
+        from views.user_management import get_user
+        g.current_user = get_user(session['username'])
     if not app.config['TESTING'] and request.method == "POST":
         token = session.pop('_csrf_token', None)
         if not token or token != request.form.get('_csrf_token'):
