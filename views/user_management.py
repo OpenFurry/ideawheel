@@ -1,14 +1,56 @@
 import hashlib, random
 
 from flask import (
+        abort,
         Blueprint,
         flash, 
         g, 
         redirect, 
         render_template, 
         request, 
-        session
+        session,
+        url_for
 )
+
+
+class User:
+    """User
+
+    An object representing a user."""
+
+    def __init__(self, username = None, email = None, display_name = None,
+            blurb = None, artist_type = None, user_type = None):
+        self.loaded = False
+        self.username = username
+        self.email = email
+        self.display_name = display_name
+        self.blurb = blurb
+        self.artist_type = artist_type
+        self.user_type = user_type
+
+        if self.username and self.email and self.user_type is not None:
+            self.loaded = True
+
+    def is_staff(self):
+        if self.loaded:
+            return self.user_type == 1
+        return None
+
+    def is_admin(self):
+        if self.loaded:
+            return self.user_type == 2
+        return None
+
+def get_user(username):
+    result = g.db.execute('select email, display_name, blurb, artist_type, '
+            'user_type from auth_users where username = ?',
+            [username])
+    row = result.fetchone()
+    if not row:
+        abort(404)
+    return User(username = username, email = row[0], display_name = row[1],
+            blurb = row[2], artist_type = row[3], user_type = row[4])
+
 
 mod = Blueprint('user_management', __name__)
 
@@ -58,12 +100,12 @@ def is_equal_time_independent(a, b):
 
 def _login(username):
     session['logged_in'] = True
-    session['username'] = username
+    session['user'] = get_user(username)
 
 @mod.route('/logout')
 def logout():
-    session['logged_in'] = False
-    session['username'] = None
+    session.pop('logged_in', None)
+    session.pop('user', None)
     flash('Successfully logged out')
     return redirect('/')
 
@@ -102,11 +144,17 @@ def show_user(username):
 
     Show all ideas that a user as created or posted to; if the user is logged
     in, then show the stubs they have pinned"""
-    pass
+    return render_template('user_management/show_user.html', user = get_user(username))
 
-@mod.route('/user/<username>/edit')
+@mod.route('/user/<username>/edit', methods = ['GET', 'POST'])
 def edit_user(username):
     """Edit User
 
     Edit a user profile"""
-    pass
+    if (not session.get('logged_in', False) or session['user'].username != username
+            or not session['user'].is_admin()):
+        abort(403)
+    user = get_user(username)
+    if request.method == 'POST':
+        return redirect(url_for('.show_user', username = username))
+    return render_template('user_management/edit_user.html', user = user)

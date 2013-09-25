@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ user.display_name }}{% endblock %}
+{% block header %}
+    {% if user.display_name %}
+        {{ user.display_name }}
+    {% else %}
+        ~{{ user.username }}
+    {% endif %}
+    - {{ user.artist_type }} 
+    - {{ user_type_to_text(user.user_type) }}
+{% endblock %}
+
+{% block body %}
+{% if user.username == session.user.username or session.user.user_type == 2 %}
+    <p><a href="{{ url_for('user_management.edit_user', username = user.username) }}">Edit user information</a></p>
+{% endif %}
+<p>{{ user.blurb }}</p>
+
+{% endblock %}

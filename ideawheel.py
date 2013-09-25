@@ -17,6 +17,11 @@ DATABASE = os.path.join(
         'ideawheel.db')
 SECRET_KEY = os.urandom(12)
 DEBUG = True
+USER_TYPES = [
+        'user',
+        'staff',
+        'admin'
+        ]
 
 # App construction
 app = Flask(__name__)
@@ -41,6 +46,14 @@ def before_request():
         if not token or token != request.form.get('_csrf_token'):
             abort(403)
 
+@app.teardown_request
+def teardown_request(exception):
+    db = getattr(g, 'db', None)
+    if db is not None:
+        db.close()
+
+
+# Template helpers
 def generate_csrf_token():
     if not app.config['TESTING'] and '_csrf_token' not in session:
         session['_csrf_token'] = hashlib.sha1(os.urandom(40)).hexdigest()
@@ -48,11 +61,10 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token 
 
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+def user_type_to_text(user_type):
+    return app.config['USER_TYPES'][user_type]
+
+app.jinja_env.globals['user_type_to_text'] = user_type_to_text
 
 # Default view
 @app.route('/')
@@ -73,4 +85,5 @@ app.register_blueprint(user_management.mod)
 
 # Development server
 if __name__ == '__main__':
+    app.secret_key = 'Development key'
     app.run()

@@ -5,11 +5,10 @@ create table auth_users (
 	hashword text not null,
 	salt integer not null,
 	email text not null,
-	display_name text,
-	blurb text,
-	artist_type text,
-	is_staff integer default 0,
-	is_admin integer default 0
+	display_name text default '',
+	blurb text default '',
+	artist_type text default 'thinker of grand ideas',
+    user_type integer default 0
 );
 
 drop table if exists idea_stubs;

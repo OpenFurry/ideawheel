@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Edit user information{% endblock %}
+{% block header %}Edit user information{% endblock %}
+
+{% block body %}
+<form method="post" action="{{ url_for('user_management.edit_user', username = user.username) }}">
+    <dl>
+        <dt><label for="email">Email address</label></dt>
+        <dd><input type="text" id="email" name="email" value="{{ user.email }}" /></dd>
+        <dt><label for="display-name">Display name</label></dt>
+        <dd><input type="text" id="display-name" name="display_name" value="{{ user.display_name }}" /></dd>
+        <dt><label for="blurb">Blurb</label></dt>
+        <dd><textarea type="text" id="blurb" name="blurb">{{ user.blurb }}</textarea></dd>
+        <dt><label for="artist-type">Artist type</label></dt>
+        <dd><input type="text" id="artist-type" name="artist_type" value="{{ user.artist_type }}" /></dd>
+        <dt><label for="user-type">User type</label></dt>
+        {% if session.user.user_type == 2 %}
+            <dd>
+                <select id="user-type" name="user_type">
+                    <option value="0"{% if user_type == 0 %} selected="selected"{% endif %}>{{ user_type_to_text(0) }}</option>
+                    <option value="1"{% if user_type == 1 %} selected="selected"{% endif %}>{{ user_type_to_text(1) }}</option>
+                    <option value="2"{% if user_type == 2 %} selected="selected"{% endif %}>{{ user_type_to_text(2) }}</option>
+                </select>
+            </dd>
+        {% endif %}
+    </dl>
+    <input type="submit" value="Save" />
+</form>
+{% endblock %}
