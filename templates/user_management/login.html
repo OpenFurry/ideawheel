@@ -3,7 +3,7 @@
 {% block header %}Login{% endblock %}
 {% block body %}
     <section>
-        <form method="post" action="{{ url_for('login') }}">
+        <form method="post" action="{{ url_for('user_management.login') }}">
             <label for="username">Username:</label> <input type="text" name="username" size="30" maxlength="60" /><br />
             <label for="password">Password:</label> <input type="password" name="password" size="30" maxlength="60" /><br />
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
@@ -12,6 +12,6 @@
             {% endif %}
             <input type="submit" value="Login" />
         </form>
-        <p>Not a member yet? <a href="{{ url_for('register') }}">Register!</a></p>
+        <p>Not a member yet? <a href="{{ url_for('user_management.register') }}">Register!</a></p>
     </section>
 {% endblock %}
