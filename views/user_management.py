@@ -198,11 +198,12 @@ def edit_user(username):
                          username])
             else:
                 g.db.execute('update auth_users set email = ? where '
-                        'username = ?', [email])
+                        'username = ?', [email, username])
         g.db.execute('update auth_users set display_name = ?, blurb = ?, '
                 'user_type = ?, artist_type = ? where username = ?',
                 [user.display_name, user.blurb, user.user_type,
                     user.artist_type, user.username])
         g.db.commit()
+        flash('Profile updated!')
         return redirect(url_for('.show_user', username = username))
     return render_template('user_management/edit_user.html', user = user)

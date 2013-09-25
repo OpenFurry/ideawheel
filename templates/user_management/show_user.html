@@ -20,7 +20,7 @@
 {% if user.username == session.username or g.current_user.is_admin() %}
     <p><a href="{{ url_for('user_management.edit_user', username = user.username) }}">Edit user information</a></p>
 {% endif %}
-<p>{{ user.blurb }}</p>
+<p>{% if user.blurb %}{{ user.blurb }}{% else %}<em>No information provided</em>{% endif %}</p>
 
 <p>TODO: Here is where the user's ideas will go</p>
 
