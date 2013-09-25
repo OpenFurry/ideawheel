@@ -83,7 +83,7 @@ def register():
             if result.fetchone()[0] != 0:
                 flash('That username or email is already in use. Perhaps you '
                       'want to login instead?')
-                return render_template('register.html')
+                return render_template('user_management/register.html')
             salt = random.randint(1000, 9999)
             hashword = hashlib.sha1(unicode(salt) + password).hexdigest()
             g.db.execute(
