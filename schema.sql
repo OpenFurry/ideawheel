@@ -1,7 +1,7 @@
 drop table if exists auth_users;
 create table auth_users (
 	id integer primary key autoincrement,
-	username text not null,
+	username text unique not null,
 	hashword text not null,
 	salt integer not null,
 	email text not null,
@@ -11,6 +11,7 @@ create table auth_users (
 	is_staff integer default 0,
 	is_admin integer default 0
 );
+create unique index user_login_idx ON auth_users(username, salt, hashword)
 
 drop table if exists idea_stubs;
 create table idea_stubs (
