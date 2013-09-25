@@ -38,15 +38,15 @@ def init_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
-    if request.method == "POST":
+    if not app.config['TESTING'] and request.method == "POST":
         token = session.pop('_csrf_token', None)
         if not token or token != request.form.get('_csrf_token'):
             abort(403)
 
 def generate_csrf_token():
-    if '_csrf_token' not in session:
+    if not app.config['TESTING'] and '_csrf_token' not in session:
         session['_csrf_token'] = hashlib.sha1(os.urandom(40)).hexdigest()
-    return session['_csrf_token']
+    return session.get('_csrf_token', '')
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token 
 
