@@ -18,7 +18,7 @@ def generate_hashword(password, salt = None):
     """Generate salt and password hash for a password and optional salt."""
     if salt is None:
         salt = os.urandom(64)
-    return salt, scrypt.hash(password.encode('utf8'), salt)
+    return scrypt.hash(password.encode('utf8'), salt), salt
 
 def check_password(username, password):
     """Check Password
@@ -32,9 +32,8 @@ def check_password(username, password):
     if row:
         stored_hash = base64.b64decode(row[1])
         stored_salt = base64.b64decode(row[0])
-        computed_hash = generate_hashword(password, salt = stored_salt)[1]
-        if is_equal_time_independent(stored_hash, computed_hash):
-            return True
+        computed_hash = generate_hashword(password, salt = stored_salt)[0]
+        return is_equal_time_independent(stored_hash, computed_hash):
     return False
 
 def is_equal_time_independent(a, b):
@@ -109,7 +108,7 @@ def register():
                 return render_template('user_management/register.html')
             # 64 bytes of salt since our hash is 64 bytes long; perhaps
             # overkill but shouldn't take too long to generate
-            salt, hashword = generate_hashword(password)
+            hashword, salt = generate_hashword(password)
             g.db.execute(
                     'insert into auth_users (username, hashword, salt, email) '
                     'values (?, ?, ?, ?)',
@@ -173,7 +172,7 @@ def edit_user(username):
                     return render_template('user_management/edit_user.html', 
                             user = user)
                 # TODO validate/confirm email - #29 - Makyo
-                salt, hashword = generate_hashword(new_password)
+                hashword, salt = generate_hashword(new_password)
                 g.db.execute('update auth_users set salt = ?, hashword = ?, '
                         'email = ? where username = ?', 
                         [base64.b64encode(salt), 
