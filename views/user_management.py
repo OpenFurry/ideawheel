@@ -12,18 +12,7 @@ from flask import (
         url_for,
 )
 
-from models.user import User
-
-def get_user(username):
-    """Return a populated User object, given a username."""
-    result = g.db.execute('select email, display_name, blurb, artist_type, '
-            'user_type from auth_users where username = ?',
-            [username])
-    row = result.fetchone()
-    if not row:
-        abort(404)
-    return User(username = username, email = row[0], display_name = row[1],
-            blurb = row[2], artist_type = row[3], user_type = row[4])
+from models.user import get_user
 
 def generate_hashword(password, salt = None):
     """Generate salt and password hash for a password and optional salt."""
@@ -140,7 +129,10 @@ def show_user(username):
 
     Show all ideas that a user as created or posted to; if the user is logged
     in, then show the stubs they have pinned"""
-    return render_template('user_management/show_user.html', user = get_user(username))
+    user = get_user(username)
+    if not user.loaded:
+        abort(404)
+    return render_template('user_management/show_user.html', user = user)
 
 @mod.route('/user/<username>/edit', methods = ['GET', 'POST'])
 def edit_user(username):
@@ -153,6 +145,9 @@ def edit_user(username):
         abort(403)
 
     user = get_user(username)
+    if not user.loaded:
+        abort(404)
+
     if request.method == 'POST':
         # Update the user with new fields so that form repopulates changed data.
         user.display_name = request.form['display_name']
