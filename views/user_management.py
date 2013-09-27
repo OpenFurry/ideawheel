@@ -33,7 +33,7 @@ def check_password(username, password):
         stored_hash = base64.b64decode(row[1])
         stored_salt = base64.b64decode(row[0])
         computed_hash = generate_hashword(password, salt = stored_salt)[0]
-        return is_equal_time_independent(stored_hash, computed_hash):
+        return is_equal_time_independent(stored_hash, computed_hash)
     return False
 
 def is_equal_time_independent(a, b):
@@ -138,9 +138,11 @@ def edit_user(username):
     """Edit User
 
     Edit a user profile"""
+    # Must be logged in.
+    if not session.get('logged_in', False):
+        abort(403)
     # Permission denied unless the user's editing themselves, or it's an admin.
-    if (not session.get('logged_in', False) and (session['username'] != username
-            or not g.current_user.is_admin())):
+    if not g.current_user.is_admin() and session['username'] != username:
         abort(403)
 
     user = get_user(username)

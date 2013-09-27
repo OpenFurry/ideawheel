@@ -12,16 +12,24 @@ class IdeawheelTests(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(ideawheel.app.config['DATABASE'])
 
-    def create_user(self):
+    def create_user(self, username = 'TestUser', password = 'TestPassword',
+            email = 'TestEmail@example.com'):
         return self.app.post('/register', data = dict(
-            username = 'TestUser',
-            password = 'TestPassword',
-            password2 = 'TestPassword',
-            email = 'TestEmail@example.com',
+            username = username,
+            password = password,
+            password2 = password,
+            email = email,
             hp = ''
         ), follow_redirects = True)
 
-    def login(self, username, password):
+    def make_admin(self, username):
+        with ideawheel.app.test_request_context('/'):
+            ideawheel.app.preprocess_request()
+            flask.g.db.execute('update auth_users set user_type = 2 where '
+                    'username = ?', [username])
+            flask.g.db.commit()
+
+    def login(self, username = 'TestUser', password = 'TestPassword'):
         return self.app.post('/login', data=dict(
             username=username,
             password=password
@@ -75,7 +83,7 @@ class UserManagementTestCase(IdeawheelTests):
         self.create_user()
 
         # Success
-        result = self.login('TestUser', 'TestPassword')
+        result = self.login()
         self.assertTrue('Logout' in result.data)
 
         # Bad user/pass
@@ -84,7 +92,7 @@ class UserManagementTestCase(IdeawheelTests):
 
     def test_logout(self):
         self.create_user()
-        self.login('TestUser', 'TestPassword')
+        self.login()
 
         # Success
         result = self.logout()
@@ -94,7 +102,7 @@ class UserManagementTestCase(IdeawheelTests):
         self.create_user()
         
         # Default data
-        self.login('TestUser', 'TestPassword')
+        self.login()
         result = self.app.get('/user/TestUser')
         expected = [
                 '~TestUser',
@@ -123,6 +131,44 @@ class UserManagementTestCase(IdeawheelTests):
                 ]
         for e in expected:
             self.assertTrue(e in result.data)
+        self.logout()
+
+        # Admin editing
+        self.create_user(username = 'Admin', password = 'Admin',
+                email = 'Admin@example.com')
+        self.make_admin('Admin')
+        self.login('Admin', 'Admin')
+        result = self.app.post('/user/TestUser/edit', data = dict(
+            display_name = 'New name',
+            blurb = 'Edited by admin',
+            artist_type = 'New artist type',
+            email = 'NewEmail@example.com',
+            password = 'TestPassword',
+            new_password = '',
+            new_password2 = ''
+        ), follow_redirects = True)
+        self.assertTrue('Edited by admin' in result.data)
+        self.logout()
+
+        # Permission denied editing someone else's profile
+        self.login()
+        result = self.app.post('/user/Admin/edit', data = dict(
+            display_name = 'New name',
+            blurb = 'Edited by non-admin',
+            artist_type = 'New artist type',
+            email = 'NewEmail@example.com',
+            password = 'TestPassword',
+            new_password = '',
+            new_password2 = ''
+        ), follow_redirects = True)
+        self.assertEqual(result.status_code, 403)
+        result = self.app.get('/user/Admin')
+        self.assertTrue('Edited by non-admin' not in result.data)
+        self.logout()
+
+        # Permission denied when logged out
+        result = self.app.get('/user/TestUser/edit')
+        self.assertEqual(result.status_code, 403)
 
 
 if __name__ == '__main__':
