@@ -2,7 +2,16 @@
 {% block title %}{% endblock %}
 {% block header %}Ideas to work with.{% endblock %}
 {% block body %}
-    <section>
-        <p>This may just go away at some point</p>
+    <section class="pure-g">
+        <div class="pure-u-1-2 big-button-container">
+            <div class="border-right">
+                <p class="big-button"><a href="{{ url_for('idea_building.random_stub') }}">Build Ideas</a></p>
+                <p>Build an idea up out of randomly provided stubs.</p>
+            </div>
+        </div>
+        <div class="pure-u-1-2 big-button-container">
+            <p class="big-button"><a href="{{ url_for('content_posting.list_ideas') }}">Browse Ideas</a></p>
+            <p>Browse ideas for which others have already created content.</p>
+        </div>
     </section>
 {% endblock %}

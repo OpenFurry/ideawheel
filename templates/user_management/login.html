@@ -2,16 +2,42 @@
 {% block title %}Login - {% endblock %}
 {% block header %}Login{% endblock %}
 {% block body %}
-    <section>
-        <form method="post" action="{{ url_for('user_management.login') }}">
-            <label for="username">Username:</label> <input type="text" name="username" size="30" maxlength="60" /><br />
-            <label for="password">Password:</label> <input type="password" name="password" size="30" maxlength="60" /><br />
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
-            {% if next_url %}
-                <input type="hidden" name="next" value="{{ next_url }}" />
-            {% endif %}
-            <input type="submit" value="Login" />
-        </form>
-        <p>Not a member yet? <a href="{{ url_for('user_management.register') }}">Register!</a></p>
+    <section class="pure-g">
+        <div class="pure-u-1-2">
+            <div class="border-right unit-inner">
+                <form method="post" action="{{ url_for('user_management.login') }}">
+                    <dl>
+                        <dt><label for="username">Username:</label></dt>
+                        <dd><input type="text" name="username" size="30" maxlength="60" /></dd>
+                        <dt><label for="password">Password:</label></dt>
+                        <dd><input type="password" name="password" size="30" maxlength="60" /></dd>
+                    </dl>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+                    {% if next_url %}
+                        <input type="hidden" name="next" value="{{ next_url }}" />
+                    {% endif %}
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+        <div class="pure-u-1-2">
+            <div class="unit-inner">
+                <form method="post" action="{{ url_for('user_management.register') }}">
+                    <dl>
+                        <dt><label for="username">Username:</label></dt>
+                        <dd><input type="text" name="username" size="30" maxlength="60" /></dd>
+                        <dt><label for="password">Password:</label></dt>
+                        <dd><input type="password" name="password" size="30" maxlength="60" /></dd>
+                        <dt><label for="password">Confirm password:</label></dt>
+                        <dd><input type="password" name="password2" size="30" maxlength="60" /></dd>
+                        <dt><label for="email">Email address:</label></dt>
+                        <dd><input type="text" name="email" size="30" maxlength="60" /></dd>
+                    </dl>
+                    <input type="text" name="hp" style="display:none;" />
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
     </section>
 {% endblock %}
