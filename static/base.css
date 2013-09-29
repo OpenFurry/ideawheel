@@ -108,6 +108,7 @@ footer .footer-block p {
     font-size: 32px;
     font-family: 'Handlee' serif;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .big-button-container {
