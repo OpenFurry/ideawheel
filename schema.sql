@@ -78,10 +78,10 @@ create table suspensions (
 	object_id integer not null,
 	object_type text not null, -- user, stub, idea, or post
 	suspended_by integer not null,
-	start_date text not null,
-	end_date text,
+	start_date float not null,
+	end_date float,
 	active boolean default true,
-	reason text not null default "This {0} has been suspended by {1}, no reason given", -- {0}: object type, {1}: staff/admin name
+	reason text not null default "This {0} has been suspended {1} by {2}, no reason given", -- {0}: object type, {1}: duration text, {2}: staff/admin name
 	foreign key(suspended_by) references auth_users(id)
 );
 create unique index suspension_idx on suspensions (object_id, object_type, active);

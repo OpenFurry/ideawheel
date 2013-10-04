@@ -1,4 +1,4 @@
-import scrypt, random, base64, os
+import datetime, scrypt, time, random, base64, os
 
 from flask import (
         Blueprint,
@@ -7,7 +7,8 @@ from flask import (
         redirect, 
         render_template, 
         request, 
-        session
+        session,
+        url_for,
 )
 
 mod = Blueprint('user_management', __name__)
@@ -19,7 +20,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         result = g.db.execute(
-                'select u.id, u.salt, u.hashword, s.active, s.end_date '
+                'select u.id, u.salt, u.hashword, s.active '
                 'from auth_users u '
                 'left join suspensions s '
                 'on u.id = s.object_id and s.object_type = ?'
@@ -27,17 +28,43 @@ def login():
                 ['user', username])
         row = result.fetchone()
         if row:
+
+            # If the user is suspended, grab the suspension information
             if row[3]:
                 result = g.db.execute(
-                        'select s.reason, s.end_date, u.username '
+                        'select s.id, s.reason, s.end_date, u.username '
                         'from suspensions s '
                         'join auth_users u '
                         'on s.suspended_by = u.id '
                         'where s.object_id = ? and s.object_type = ?',
                         [row[0], 'user'])
                 suspension = result.fetchone()
-                flash(suspension[0].format('user', suspension[2]))
-                return redirect('/')
+
+                # If the suspension has ended, unset its active flag.
+                # Otherwise, warn the user of the suspension and prevent login.
+                if suspension[2] and suspension[2] < time.time():
+                    g.db.execute(
+                            'update suspensions set active = 0 '
+                            'where id = ?', [suspension[0]])
+                    g.db.commit()
+                    flash('Your suspension has been lifted! :)')
+                else:
+                    flash(suspension[1].format(
+                        # Type of object suspended
+                        'account', 
+                        # Suspension end date or 'indefinitely'
+                        'until {}'.format(
+                            datetime.datetime
+                                .fromtimestamp(suspension[2])
+                                .strftime("%A, %d. %B %Y %I:%M%p")) \
+                                if suspension[2] else 'indefinitely',
+                        # Admin/staff who created the suspension
+                        '<a href="{}">{}</a>'.format(
+                            url_for('.show_user', username = suspension[3]), 
+                            suspension[3])))
+                    return redirect('/')
+
+            # No suspensions found, so attempt to login.
             stored_salt = base64.b64decode(row[1])
             stored_hash = base64.b64decode(row[2])
             computed_hash = scrypt.hash(password.encode('utf8'), stored_salt)
