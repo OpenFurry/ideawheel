@@ -19,12 +19,27 @@ def login():
         username = request.form['username']
         password = request.form['password']
         result = g.db.execute(
-                'select salt, hashword from auth_users where username = ?',
-                [username])
+                'select u.id, u.salt, u.hashword, s.active, s.end_date '
+                'from auth_users u '
+                'left join suspensions s '
+                'on u.id = s.object_id and s.object_type = ?'
+                'where u.username = ?',
+                ['user', username])
         row = result.fetchone()
         if row:
-            stored_hash = base64.b64decode(row[1])
-            stored_salt = base64.b64decode(row[0])
+            if row[3]:
+                result = g.db.execute(
+                        'select s.reason, s.end_date, u.username '
+                        'from suspensions s '
+                        'join auth_users u '
+                        'on s.suspended_by = u.id '
+                        'where s.object_id = ? and s.object_type = ?',
+                        [row[0], 'user'])
+                suspension = result.fetchone()
+                flash(suspension[0].format('user', suspension[2]))
+                return redirect('/')
+            stored_salt = base64.b64decode(row[1])
+            stored_hash = base64.b64decode(row[2])
             computed_hash = scrypt.hash(password.encode('utf8'), stored_salt)
             if is_equal_time_independent(stored_hash, computed_hash):
                 _login(username)

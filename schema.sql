@@ -76,12 +76,12 @@ drop table if exists suspensions;
 create table suspensions (
 	id integer primary key autoincrement,
 	object_id integer not null,
-	object_type text not null; -- user, stub, idea, or post
-	flagged_by integer not null,
+	object_type text not null, -- user, stub, idea, or post
+	suspended_by integer not null,
 	start_date text not null,
 	end_date text,
 	active boolean default true,
 	reason text not null default "This {0} has been suspended by {1}, no reason given", -- {0}: object type, {1}: staff/admin name
-	foreign key(flagged_by) references auth_users(id)
+	foreign key(suspended_by) references auth_users(id)
 );
 create unique index suspension_idx on suspensions (object_id, object_type, active);
