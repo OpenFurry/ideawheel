@@ -2,29 +2,41 @@
 <html>
     <head>
         <title>{% block title %}{% endblock %}Ideawheel</title>
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}" />
     </head>
     <body>
         <header>
-            <h1>Ideawheel</h1>
-            <h2>{% block header %}{% endblock %}</h2>
-            <div class="usermgmt">
-                {% if session.logged_in %}
-                Logged in as <a href="{{ url_for('user_management.show_user', username=session.username) }}">{{ session.username }}</a> | <a href="{{ url_for('user_management.logout') }}">Logout</a>
-                {% else %}
-                <a href="{{ url_for('user_management.login') }}">Login</a> | <a href="{{ url_for('user_management.register') }}">Register</a>
-                {% endif %}
-            </div>
-            <div class="messages">
-                {% for message in get_flashed_messages() %}
-                    <div class="message">{{ message }}</div>
-                {% endfor %}
+            <div>
+                <h1><a href="{{ url_for('default') }}">Ideawheel</a></h1>
+                <h2>{% block header %}{% endblock %}</h2>
+                <div class="usermgmt">
+                    {% if session.logged_in %}
+                    Logged in as <a href="{{ url_for('user_management.show_user', username=session.username) }}">{{ session.username }}</a> | <a href="{{ url_for('user_management.logout') }}">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('user_management.login') }}">Login</a> | <a href="{{ url_for('user_management.register') }}">Register</a>
+                    {% endif %}
+                </div>
+                <div class="messages">
+                    {% for message in get_flashed_messages() %}
+                        <div class="message">{{ message }}</div>
+                    {% endfor %}
+                </div>
             </div>
         </header>
         <article>
             {% block body %}{% endblock %}
         </article>
-        <footer>
-            Copyright notice, github link, micro-about.
+        <footer class="pure-g">
+            <div class="footer-block pure-u-1-3">
+                <p>Ideawheel is a randomizing idea generator for artists of all types.  Build ideas, post content, and share!</p>
+            </div>
+            <div class="footer-block pure-u-1-3">
+                <p>Ideawheel itself is licensed under the MIT license; all ideas are free to be used; all content is copyright the original creators.</p>
+            </div>
+            <div class="footer-block pure-u-1-3">
+                <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+            </div>
         </footer>
     </body>
 </html>

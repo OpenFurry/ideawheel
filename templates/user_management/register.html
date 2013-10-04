@@ -4,10 +4,16 @@
 {% block body %}
     <section>
         <form method="post" action="{{ url_for('user_management.register') }}">
-            <label for="username">Username:</label> <input type="text" name="username" size="30" maxlength="60" /><br />
-            <label for="password">Password:</label> <input type="password" name="password" size="30" maxlength="60" /><br />
-            <label for="password">Confirm password:</label> <input type="password" name="password2" size="30" maxlength="60" /><br />
-            <label for="email">Email address:</label> <input type="text" name="email" size="30" maxlength="60" /><br />
+            <dl>
+                <dt><label for="username">Username:</label></dt>
+                <dd><input type="text" name="username" size="30" maxlength="60" /></dd>
+                <dt><label for="password">Password:</label></dt>
+                <dd><input type="password" name="password" size="30" maxlength="60" /></dd>
+                <dt><label for="password">Confirm password:</label></dt>
+                <dd><input type="password" name="password2" size="30" maxlength="60" /></dd>
+                <dt><label for="email">Email address:</label></dt>
+                <dd><input type="text" name="email" size="30" maxlength="60" /></dd>
+            </dl>
             <input type="text" name="hp" style="display:none;" />
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
             <input type="submit" value="Register" />

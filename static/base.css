@@ -1,0 +1,117 @@
+@import url(http://fonts.googleapis.com/css?family=Handlee);
+
+body {
+    margin: 0;
+    padding: 0;
+    background: url('greyzz/greyzz.png') repeat;
+    font-size: 18px;
+    padding-right: 162px;
+    padding-left: 162px;
+}
+
+body * {
+    font-family: serif;
+}
+
+header {
+    border-top: 1px solid #ccc;
+    height: 200px;
+    width: 100%;
+    margin: 100px 0 0.5em 0;
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+header > div {
+    padding: 0 0 0 0.5em;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Handlee' serif;
+    font-weight: bold;
+}
+
+h1 a, h1 a:active, h1 a:visited, h1 a:hover {
+    font-family: 'Handlee' serif;
+    text-decoration: none;
+    color: #000;
+}
+
+a {
+    color: #666;
+}
+
+a:visited, a:active {
+    color: #888;
+}
+
+a:hover {
+    color: #a88;
+}
+
+input, textarea, button {
+    border: 2px solid #ddd;
+}
+
+button {
+    background-color: rgba(200, 200, 200, 0.5);
+}
+
+
+article {
+    border-top: 1px solid #ccc;
+    width: 100%;
+    min-height: 100px;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+article > section {
+    margin: 0.5em;
+}
+
+footer {
+    border-top: 1px solid #ccc;
+    padding: 0;
+    margin: 0 0 0 0;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+footer .footer-block {
+    display: inline-block;
+    position: relative;
+    min-height: 150px;
+    vertical-align: top;
+    margin: 0;
+    padding: 0;
+}
+
+footer .footer-block p {
+    padding: 0 1em 0 1em;
+    border-right: 1px solid #ccc;
+    font-family: serif !important;
+}
+
+.unit-inner {
+    margin: 0;
+    padding: 0.5em;
+}
+
+.border-right {
+    border-right: 1px solid #ccc;
+    min-height: 200px;
+}
+
+/* Specifics */
+
+.big-button a {
+    font-size: 32px;
+    font-family: 'Handlee' serif;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.big-button-container {
+    text-align: center;
+}
+
