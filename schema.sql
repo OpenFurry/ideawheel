@@ -80,7 +80,7 @@ create table suspensions (
 	start_date float not null,
 	end_date float,
 	active boolean default true,
-	reason text not null default "This {0} has been suspended {1} by {2}, no reason given", -- {0}: object type, {1}: duration text, {2}: staff/admin name
+	reason text not null default "This {object_type} has been suspended {duration} by {user}, no reason given",
 	foreign key(suspended_by) references auth_users(id)
 );
 create unique index suspension_idx on suspensions (object_id, object_type, active);

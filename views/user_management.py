@@ -77,13 +77,15 @@ def login():
         password = request.form['password']
         if check_password(username, password):
             # Grab any suspension information.
-            result = g.db.execute(
-                    'select s.id, s.reason, s.end_date, s.active, u.username '
-                    'from suspensions s '
-                    'join auth_users u '
-                    'on s.suspended_by = u.id '
-                    'where s.object_id = ? and s.object_type = ?',
-                    [row[0], 'user'])
+            result = g.db.execute('''
+                    select s.id, s.reason, s.end_date, s.active, a.username
+                        from suspensions s
+                            join auth_users a
+                                on s.suspended_by = a.id
+                            join auth_users u
+                                on s.object_id = u.id and u.username = ?
+                        where s.object_type = ?''',
+                    [username, 'user'])
             suspension = result.fetchone()
 
             if suspension and suspension[3]:
@@ -98,15 +100,15 @@ def login():
                 else:
                     flash(suspension[1].format(
                         # Type of object suspended
-                        'account', 
+                        object_type = 'account', 
                         # Suspension end date or 'indefinitely'
-                        'until {}'.format(
+                        duration = 'until {}'.format(
                             datetime.datetime
                                 .fromtimestamp(suspension[2])
                                 .strftime("%A, %d. %B %Y %I:%M%p")) \
                                 if suspension[2] else 'indefinitely',
                         # Admin/staff who created the suspension
-                        '<a href="{}">{}</a>'.format(
+                        user = '<a href="{0}">{1}</a>'.format(
                             url_for('.show_user', username = suspension[4]), 
                             suspension[4])))
                     return redirect('/')
