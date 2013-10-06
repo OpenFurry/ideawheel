@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if user.display_name %}
+        {{ user.display_name }}
+    {% else %}
+        ~{{ user.username }}
+    {% endif %} -
+{% endblock %}
+{% block header %}
+    {% if user.display_name %}
+        {{ user.display_name }}
+    {% else %}
+        ~{{ user.username }}
+    {% endif %}
+    - {{ user.artist_type }} 
+    - {{ user_type_to_text(user.user_type) }}
+{% endblock %}
+
+{% block body %}
+{% if user.username == session.username or g.current_user.is_admin() %}
+    <p><a href="{{ url_for('user_management.edit_user', username = user.username) }}">Edit user information</a></p>
+{% endif %}
+<p>{% if user.blurb %}{{ user.blurb }}{% else %}<em>No information provided</em>{% endif %}</p>
+
+<p>TODO: Here is where the user's ideas will go</p>
+
+{% if user.username == session.username or g.current_user.is_admin() %}
+    <p>TODO: Here is where the user's pinned stubs will go</p>
+{% endif %}
+
+{% endblock %}
