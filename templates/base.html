@@ -19,7 +19,7 @@
                 </div>
                 <div class="messages">
                     {% for message in get_flashed_messages() %}
-                        <div class="message">{{ message }}</div>
+                        <div class="message">{{ message|safe }}</div>
                     {% endfor %}
                 </div>
             </div>
