@@ -1,5 +1,4 @@
 #!/bin/bash
 
-pip install flask
-pip install scrypt
+pip install -r dev-requirements.txt
 
