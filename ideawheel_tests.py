@@ -170,6 +170,27 @@ class UserManagementTestCase(IdeawheelTests):
         result = self.app.get('/user/TestUser/edit')
         self.assertEqual(result.status_code, 403)
 
+class IdeaStubTestCase(IdeawheelTests):
+    def test_create_stub(self):
+        # Admin only action - hit /stubs/create to make a new one
+        # Normal user bounced
+        self.login()
+        result = self.app.post('/stub/create', data = dict(
+            text = 'Sample stub text',
+            title = 'Sample stub'
+        ), follow_redirects = True)
+        self.assertEqual(result.status_code, 403)
+
+        # TODO pull into helper
+        self.create_user(username = 'Admin', password = 'Admin',
+                email = 'Admin@example.com')
+        self.make_admin('Admin')
+        self.login('Admin', 'Admin')
+
+        result = self.app.post('/stub/create', data = dict(
+            stub_text = 'Sample stub text',
+        ), follow_redirects = True)
+        self.assertTrue('Stub created' in result.data)
 
 if __name__ == '__main__':
     unittest.main()
