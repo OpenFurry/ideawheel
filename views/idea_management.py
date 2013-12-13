@@ -10,6 +10,8 @@ from flask import (
         url_for
 )
 
+import models.stub
+
 mod = Blueprint('idea_management', __name__)
 
 @mod.route('/stub/create', methods = ['GET', 'POST'])
@@ -22,17 +24,12 @@ def create_stub():
         abort(403)
 
     if request.method == 'POST':
-        stub = request.form['stub_text']
-
-        result = g.db.execute(
-            'insert into idea_stubs (stub) values (?)',
-            [stub]
-        )
-        stub_id = result.lastrowid
-        g.db.commit()
+        stub_text = request.form['stub_text']
+        # TODO input validation/sanitation?
+        created_stub = models.stub.create_stub(stub_text)
 
         flash('Stub created!')
-        return redirect(url_for('.view_stub', stub_id = stub_id))
+        return redirect(url_for('.view_stub', stub_id = created_stub.stub_id))
     
     return render_template('idea_management/create_stub.html')
 
@@ -41,6 +38,9 @@ def view_stub(stub_id):
     """View Stub
 
     View a stub and all of the ideas of which it is a part."""
+    stub = models.stub.get_stub(stub_id)
+    if stub is None:
+        abort(404)
     return render_template('idea_management/view_stub.html')
 
 @mod.route('/stub/<stub_id>/retire', methods = ['GET', 'POST'])
