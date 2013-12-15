@@ -28,7 +28,8 @@ devserver:
 check: test lint
 
 test:
-	@python ideawheel_tests.py
+	@nosetests --verbosity=2 --with-coverage --cover-package=ideawheel,models,views
+	@rm .coverage
 
 lint:
 	@flake8 --show-source .
