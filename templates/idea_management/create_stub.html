@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Create a new stub{% endblock %}
+{% block header %}Create Stub{% endblock %}
+{% block body %}
+<p>Form for making things!</p>
+<form method="post" action="{{ url_for('idea_management.create_stub') }}">
+  <label for="stub_text">Stub:</label>
+  <input type="text" name="stub_text" size="60" maxlength="140" />
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+  <button type="submit">Create!</button>
+</form>
+{% endblock %}
