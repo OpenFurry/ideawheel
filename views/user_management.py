@@ -1,6 +1,8 @@
 import base64
+import datetime
 import os
 import scrypt
+import time
 
 from flask import (
     abort,
@@ -75,6 +77,7 @@ def _login(username):
 
 mod = Blueprint('user_management', __name__)
 
+
 @mod.route('/login', methods=['GET', 'POST'])
 def login():
     next_url = request.form.get('next', request.args.get('next', '/'))
@@ -91,7 +94,7 @@ def login():
                             join auth_users u
                                 on s.object_id = u.id and u.username = ?
                         where s.object_type = ?''',
-                    [username, 'user'])
+                                  [username, 'user'])
             suspension = result.fetchone()
 
             if suspension and suspension[3]:
@@ -99,23 +102,24 @@ def login():
                 # Otherwise, warn the user of the suspension and prevent login.
                 if suspension[2] and suspension[2] < time.time():
                     g.db.execute(
-                            'update suspensions set active = 0 '
-                            'where id = ?', [suspension[0]])
+                        'update suspensions set active = 0 '
+                        'where id = ?', [suspension[0]])
                     g.db.commit()
                     flash('Your suspension has been lifted! :)')
                 else:
+                    duration = 'until {}'.format(
+                        datetime.datetime
+                        .fromtimestamp(suspension[2])
+                        .strftime("%A, %d. %B %Y %I:%M%p")) \
+                        if suspension[2] else 'indefinitely',
                     flash(suspension[1].format(
                         # Type of object suspended
-                        object_type = 'account', 
+                        object_type='account',
                         # Suspension end date or 'indefinitely'
-                        duration = 'until {}'.format(
-                            datetime.datetime
-                                .fromtimestamp(suspension[2])
-                                .strftime("%A, %d. %B %Y %I:%M%p")) \
-                                if suspension[2] else 'indefinitely',
+                        duration=duration,
                         # Admin/staff who created the suspension
-                        user = '<a href="{0}">{1}</a>'.format(
-                            url_for('.show_user', username = suspension[4]), 
+                        user='<a href="{0}">{1}</a>'.format(
+                            url_for('.show_user', username=suspension[4]),
                             suspension[4])))
                     return redirect('/')
 
@@ -124,6 +128,7 @@ def login():
             return redirect(next_url)
         flash('Incorrect username or password.')
     return render_template('user_management/login.html', next_url=next_url)
+
 
 @mod.route('/logout')
 def logout():

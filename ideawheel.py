@@ -55,6 +55,7 @@ def before_request():
         if not token or token != request.form.get('_csrf_token'):
             abort(403)
 
+
 @app.teardown_request
 def teardown_request(exception):
     db = getattr(g, 'db', None)

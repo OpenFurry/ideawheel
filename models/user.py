@@ -1,5 +1,6 @@
 from flask import g
 
+
 class User:
     """User
 
