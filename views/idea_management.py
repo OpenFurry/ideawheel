@@ -1,20 +1,21 @@
 from flask import (
-        Blueprint,
-        session,
-        abort,
-        render_template,
-        g,
-        request,
-        flash,
-        redirect,
-        url_for
+    Blueprint,
+    session,
+    abort,
+    render_template,
+    g,
+    request,
+    flash,
+    redirect,
+    url_for,
 )
 
 import models.stub
 
 mod = Blueprint('idea_management', __name__)
 
-@mod.route('/stub/create', methods = ['GET', 'POST'])
+
+@mod.route('/stub/create', methods=['GET', 'POST'])
 def create_stub():
     """Create Stub (staff only)
 
@@ -29,9 +30,10 @@ def create_stub():
         created_stub = models.stub.create_stub(stub_text)
 
         flash('Stub created!')
-        return redirect(url_for('.view_stub', stub_id = created_stub.stub_id))
-    
+        return redirect(url_for('.view_stub', stub_id=created_stub.stub_id))
+
     return render_template('idea_management/create_stub.html')
+
 
 @mod.route('/stub/<stub_id>')
 def view_stub(stub_id):
@@ -43,7 +45,8 @@ def view_stub(stub_id):
         abort(404)
     return render_template('idea_management/view_stub.html')
 
-@mod.route('/stub/<stub_id>/retire', methods = ['GET', 'POST'])
+
+@mod.route('/stub/<stub_id>/retire', methods=['GET', 'POST'])
 def retire_stub():
     """Retire Stub (staff only)
 
@@ -51,7 +54,8 @@ def retire_stub():
     any ideas."""
     pass
 
-@mod.route('/stub/<stub_id>/unretire', methods = ['GET', 'POST'])
+
+@mod.route('/stub/<stub_id>/unretire', methods=['GET', 'POST'])
 def unretire_stub():
     """Unretire Stub (staff only)
 
