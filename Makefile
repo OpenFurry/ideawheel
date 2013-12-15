@@ -7,7 +7,9 @@ help:
 	@echo '   make deps       installs dependencies'
 	@echo '   make basedb     sets up an empty local database'
 	@echo '   make devserver  starts the development server'
+	@echo '   make check      run tests and lint'
 	@echo '   make test       run the tests'
+	@echo '   make lint       run flake8 for pep8 linting'
 	@echo '   make clean      removes compiled files'
 	@echo '   make help       displays this message'
 
@@ -23,10 +25,15 @@ $(LOCAL_DB): $(DB_SCHEMA)
 devserver:
 	python ideawheel.py
 
+check: test lint
+
 test:
-	python ideawheel_tests.py
+	@python ideawheel_tests.py
+
+lint:
+	@flake8 --show-source .
 
 clean:
 	find . -name '*.py[co]' -exec rm -f {} \;
 
-.PHONY: help deps clean devserver basedb
+.PHONY: help deps basedb devserver check test lint clean

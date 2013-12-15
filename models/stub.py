@@ -1,13 +1,15 @@
 from flask import g
 
+
 class Stub:
     """Stub
 
     A small portion of an idea. Each stub is a small sentence fragment, image,
     or phrase that can be assembled to create an idea."""
-    def __init__(self, stub_id = None, text = None):
+    def __init__(self, stub_id=None, text=None):
         self.stub_id = stub_id
         self.text = text
+
 
 def create_stub(stub_text):
     """Create a new stub with the given text"""
@@ -18,13 +20,13 @@ def create_stub(stub_text):
     added_stub_id = result.lastrowid
     g.db.commit()
 
-    return Stub(stub_id = added_stub_id, text = stub_text)
+    return Stub(stub_id=added_stub_id, text=stub_text)
 
 
 def get_random_stub():
     """Get a random stub"""
     # Naive approach: Rely on sqlite to do the randomness for now since
-    # it's easy to implement and relatively performant. 
+    # it's easy to implement and relatively performant.
     # What we probably want isn't to call this multiple times but to have
     # something that picks N stubs without replacement.
     result = g.db.execute(
@@ -32,15 +34,16 @@ def get_random_stub():
         'WHERE id >= (ABS(RANDOM()) % (SELECT MAX(id) FROM idea_stubs) + 1) '
         'LIMIT 1')
     row = result.fetchone()
-    return Stub(stub_id = row[0], text = row[1])
+    return Stub(stub_id=row[0], text=row[1])
+
 
 def get_stub(stub_id):
     """Get a particular stub specified by stub_id"""
     result = g.db.execute('SELECT id, stub FROM idea_stubs WHERE id = ?',
                           [stub_id])
     row = result.fetchone()
-    
+
     if not row:
         return None
 
-    return Stub(stub_id = row[0], text = row[1])
+    return Stub(stub_id=row[0], text=row[1])
