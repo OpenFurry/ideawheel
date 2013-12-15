@@ -19,8 +19,8 @@ def create_stub():
     """Create Stub (staff only)
 
     Create a new idea stub."""
-    # Must be a logged in admin
-    if not (session.get('logged_in', False) and g.current_user.is_admin()):
+    # Must be a logged in staff member
+    if not (session.get('logged_in', False) and g.current_user.is_staff()):
         abort(403)
 
     if request.method == 'POST':
