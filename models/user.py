@@ -19,7 +19,7 @@ class User:
 
     def is_staff(self):
         if self.loaded:
-            return self.user_type == 1
+            return self.user_type >= 1
         return None
 
     def is_admin(self):
