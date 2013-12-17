@@ -12,6 +12,8 @@ from flask import (
     session,
 )
 
+from flaskext.markdown import Markdown
+
 # Configuration
 DATABASE = os.path.join(
     os.path.dirname(
@@ -29,6 +31,7 @@ USER_TYPES = [
 # App construction
 app = Flask(__name__)
 app.config.from_object(__name__)
+Markdown(app)
 
 
 # App helpers
