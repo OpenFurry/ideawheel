@@ -22,4 +22,11 @@ Developing
 Hack away!  Be sure to run `make check` before creating a pull-request to ensure
 that tests pass, flake8 is happy, and code coverage stays at a reasonable level.
 
+
+Developing
+----------
+
+Ideawheel is totally open to pull requests from anyone.  Get in touch through
+Github, email, or join us at #ideawheel on Freenode.
+
 [alpha]: https://github.com/makyo/ideawheel/issues?milestone=1&state=open
