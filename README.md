@@ -11,4 +11,11 @@ Dependencies
 * [flask](http://flask.pocoo.org/docs/)
 * [py-scrypt](https://pypi.python.org/pypi/scrypt/)
 
+
+Developing
+----------
+
+Ideawheel is totally open to pull requests from anyone.  Get in touch through
+Github, email, or join us at #ideawheel on Freenode.
+
 [alpha]: https://github.com/makyo/ideawheel/issues?milestone=1&state=open
