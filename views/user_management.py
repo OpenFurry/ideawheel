@@ -1,6 +1,8 @@
 import base64
+import datetime
 import os
 import scrypt
+import time
 
 from flask import (
     abort,
@@ -83,6 +85,45 @@ def login():
         username = request.form['username']
         password = request.form['password']
         if check_password(username, password):
+            # Grab any suspension information.
+            result = g.db.execute('''
+                    select s.id, s.reason, s.end_date, s.active, a.username
+                        from suspensions s
+                            join auth_users a
+                                on s.suspended_by = a.id
+                            join auth_users u
+                                on s.object_id = u.id and u.username = ?
+                        where s.object_type = ?''',
+                                  [username, 'user'])
+            suspension = result.fetchone()
+
+            if suspension and suspension[3]:
+                # If the suspension has ended, unset its active flag.
+                # Otherwise, warn the user of the suspension and prevent login.
+                if suspension[2] and suspension[2] < time.time():
+                    g.db.execute(
+                        'update suspensions set active = 0 '
+                        'where id = ?', [suspension[0]])
+                    g.db.commit()
+                    flash('Your suspension has been lifted! :)')
+                else:
+                    duration = 'until {}'.format(
+                        datetime.datetime
+                        .fromtimestamp(suspension[2])
+                        .strftime("%A, %d. %B %Y %I:%M%p")) \
+                        if suspension[2] else 'indefinitely',
+                    flash(suspension[1].format(
+                        # Type of object suspended
+                        object_type='account',
+                        # Suspension end date or 'indefinitely'
+                        duration=duration,
+                        # Admin/staff who created the suspension
+                        user='<a href="{0}">{1}</a>'.format(
+                            url_for('.show_user', username=suspension[4]),
+                            suspension[4])))
+                    return redirect('/')
+
+            # No suspensions found, so attempt to login.
             _login(username)
             return redirect(next_url)
         flash('Incorrect username or password.')

@@ -70,3 +70,17 @@ create table posts (
 	foreign key(idea_id) references ideas(id),
 	foreign key(user_id) references auth_users(id)
 );
+
+drop table if exists suspensions;
+create table suspensions (
+	id integer primary key autoincrement,
+	object_id integer not null,
+	object_type text not null, -- user, stub, idea, or post
+	suspended_by integer not null,
+	start_date float not null,
+	end_date float,
+	active boolean default true,
+	reason text not null default "This {object_type} has been suspended {duration} by {user}, no reason given",
+	foreign key(suspended_by) references auth_users(id)
+);
+create unique index suspension_idx on suspensions (object_id, object_type, active);
