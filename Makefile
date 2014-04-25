@@ -26,7 +26,7 @@ devserver:
 	python ideawheel.py
 
 devfixtures: basedb
-	for i in `find fixtures/dev/*.sql`; do $(SQLITE) $(LOCAL_DB) < $$i; done
+	for i in `find fixtures/dev/*.sql | sort`; do $(SQLITE) $(LOCAL_DB) < $$i; done
 
 check: test lint
 
