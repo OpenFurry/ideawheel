@@ -1,6 +1,16 @@
 from flask import (
+    abort,
     Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
 )
+
+from models import stub
 
 mod = Blueprint('idea_building', __name__)
 
@@ -11,7 +21,8 @@ def random_stub():
 
     Get a random idea stub to show to the user. If the stub has been
     used in an idea already, provide a link."""
-    pass
+    return render_template('idea_building/random_stub.html',
+                           stub=stub.get_random_stub())
 
 
 @mod.route('/idea/create', methods=['POST'])
@@ -28,4 +39,11 @@ def pin_stub(stub_id):
 
     Pin a stub so that idea stubs can be strung together into something
     coherent."""
+    pass
+
+@mod.route('/unpin/<int:pin_id>')
+def unpin_stub(pin_id):
+    """Unpin stub
+
+    Remove a pinned stub from the list of pinned stubs."""
     pass

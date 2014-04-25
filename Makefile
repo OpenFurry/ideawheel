@@ -25,6 +25,9 @@ $(LOCAL_DB): $(DB_SCHEMA)
 devserver:
 	python ideawheel.py
 
+devfixtures: basedb
+	for i in `find fixtures/dev/*.sql`; do $(SQLITE) $(LOCAL_DB) < $$i; done
+
 check: test lint
 
 test:
@@ -37,4 +40,4 @@ lint:
 clean:
 	find . -name '*.py[co]' -exec rm -f {} \;
 
-.PHONY: help deps basedb devserver check test lint clean
+.PHONY: help deps basedb devfixtures devserver check test lint clean
