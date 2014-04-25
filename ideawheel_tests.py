@@ -52,6 +52,13 @@ class IdeawheelTests(unittest.TestCase):
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
 
+    def create_stub(self, stub_text, link=None):
+        with ideawheel.app.test_request_context('/'):
+            ideawheel.app.preprocess_request()
+            flask.g.db.execute('insert into idea_stubs (stub, link) values '
+                               '(?, ?)', [stub_text, link])
+            flask.g.db.commit()
+
 
 class UserManagementTestCase(IdeawheelTests):
 
@@ -219,6 +226,21 @@ class IdeaStubTestCase(IdeawheelTests):
             stub_text='Sample stub text',
         ), follow_redirects=True)
         self.assertIn('Stub created', result.data)
+
+    def test_random_stub(self):
+        # This assumes that the randomness of SQLite works, focusing instead on
+        # displaying the random stub.
+        self.login()
+        self.create_stub('A stub without a link')
+        result = self.app.get('/idea')
+        self.assertIn('A stub without a link', result.data)
+
+    def test_random_stub_with_link(self):
+        self.login()
+        self.create_stub('A stub with a link', link='the link itself')
+        result = self.app.get('/idea')
+        self.assertIn('A stub with a link', result.data)
+        self.assertIn('the link itself', result.data)
 
 if __name__ == '__main__':
     unittest.main()
