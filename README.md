@@ -11,6 +11,7 @@ Dependencies
 * Python and pip, or a virtualenv with the same
 * SQLite3
 * Make
+* libssl-dev (needed for building scrypt)
 
 Developing
 ----------
