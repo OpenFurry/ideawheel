@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Random Idea Stub - {% endblock %}
+{% block header %}Random Idea Stub{% endblock %}
+
+{% block body %}
+<div class="stub">
+    <a href="{{ url_for('idea_building.pin_stub', stub_id = stub.stub_id) }}">{{ stub.text }}</a>
+    {% if stub.link %}<a href="{{ stub.link }}">[ External Link ]</a>{% endif %}
+</div>
+{% endblock %}
