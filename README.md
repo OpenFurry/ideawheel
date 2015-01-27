@@ -30,4 +30,4 @@ Developing
 Ideawheel is totally open to pull requests from anyone.  Get in touch through
 Github, email, or join us at #ideawheel on Freenode.
 
-[alpha]: https://github.com/makyo/ideawheel/issues?milestone=1&state=open
+[alpha]: https://github.com/OpenFurry/ideawheel/milestones/Alpha
