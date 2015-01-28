@@ -14,7 +14,7 @@ help:
 	@echo '   make help       displays this message'
 
 deps:
-	pip install -r dev-requirements.txt
+	pip install -r pip-requirements.txt
 
 basedb: $(LOCAL_DB)
 
