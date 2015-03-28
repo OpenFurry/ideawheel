@@ -14,6 +14,13 @@ from flask import (
 
 from flaskext.markdown import Markdown
 
+from views import (
+    content_posting,
+    idea_building,
+    idea_management,
+    user_management,
+)
+
 # Configuration
 DATABASE = os.path.join(
     os.path.dirname(
@@ -87,12 +94,6 @@ def default():
     return render_template('index.html')
 
 # Register blueprints
-from views import (
-    content_posting,
-    idea_building,
-    idea_management,
-    user_management,
-)
 app.register_blueprint(content_posting.mod)
 app.register_blueprint(idea_building.mod)
 app.register_blueprint(idea_management.mod)

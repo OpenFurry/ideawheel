@@ -1,13 +1,6 @@
 from flask import (
-    abort,
     Blueprint,
-    flash,
-    g,
-    redirect,
     render_template,
-    request,
-    session,
-    url_for,
 )
 
 from models import stub
@@ -40,6 +33,7 @@ def pin_stub(stub_id):
     Pin a stub so that idea stubs can be strung together into something
     coherent."""
     pass
+
 
 @mod.route('/unpin/<int:pin_id>')
 def unpin_stub(pin_id):
