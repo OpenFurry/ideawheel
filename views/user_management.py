@@ -141,9 +141,9 @@ def logout():
 @mod.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        if (not request.form['username'] or not request.form['password']
-                or not request.form['email'] or request.form['hp']
-                or request.form['password'] != request.form['password2']):
+        if ((not request.form['username'] or not request.form['password']) or
+                (not request.form['email'] or request.form['hp']) or
+                (request.form['password'] != request.form['password2'])):
             flash('All fields are required.')
         else:
             username = request.form['username']
