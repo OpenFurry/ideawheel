@@ -35,7 +35,7 @@ test:
 	@rm .coverage
 
 lint:
-	@flake8 --show-source .
+	@flake8 --show-source ideawheel.py ideawheel_tests.py models views
 
 clean:
 	find . -name '*.py[co]' -exec rm -f {} \;
