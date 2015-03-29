@@ -1,6 +1,9 @@
 ideawheel
 =========
 
+[![Build
+Status](https://travis-ci.org/OpenFurry/ideawheel.svg?branch=master)](https://travis-ci.org/OpenFurry/ideawheel)
+
 A wheel of ideas for creators.  Build ideas up from stubs and then post creative
 works inspired by those ideas to share with other creators.
 
