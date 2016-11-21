@@ -3,6 +3,7 @@ ideawheel
 
 [![Build
 Status](https://travis-ci.org/OpenFurry/ideawheel.svg?branch=master)](https://travis-ci.org/OpenFurry/ideawheel)
+[![Coverage Status](https://coveralls.io/repos/github/OpenFurry/ideawheel/badge.svg?branch=master)](https://coveralls.io/github/OpenFurry/ideawheel?branch=master)
 
 A wheel of ideas for creators.  Build ideas up from stubs and then post creative
 works inspired by those ideas to share with other creators.
