@@ -79,11 +79,13 @@ def generate_csrf_token():
         session['_csrf_token'] = hashlib.sha1(os.urandom(40)).hexdigest()
     return session.get('_csrf_token', '')
 
+
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
 def user_type_to_text(user_type):
     return app.config['USER_TYPES'][user_type]
+
 
 app.jinja_env.globals['user_type_to_text'] = user_type_to_text
 
@@ -92,6 +94,7 @@ app.jinja_env.globals['user_type_to_text'] = user_type_to_text
 @app.route('/')
 def default():
     return render_template('index.html')
+
 
 # Register blueprints
 app.register_blueprint(content_posting.mod)

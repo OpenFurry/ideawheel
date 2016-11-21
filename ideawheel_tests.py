@@ -71,7 +71,7 @@ class UserManagementTestCase(IdeawheelTests):
             email='TestEmail@example.com',
             hp=''
         ), follow_redirects=True)
-        self.assertIn('All fields are required', result.data)
+        self.assertIn(b'All fields are required', result.data)
 
         # Missing field
         result = self.app.post('/register', data=dict(
@@ -81,7 +81,7 @@ class UserManagementTestCase(IdeawheelTests):
             email='',
             hp=''
         ), follow_redirects=True)
-        self.assertIn('All fields are required', result.data)
+        self.assertIn(b'All fields are required', result.data)
 
         # Honeypot with data
         result = self.app.post('/register', data=dict(
@@ -91,27 +91,27 @@ class UserManagementTestCase(IdeawheelTests):
             email='TestEmail@example.com',
             hp='Actually a spammer'
         ), follow_redirects=True)
-        self.assertIn('All fields are required', result.data)
+        self.assertIn(b'All fields are required', result.data)
 
         # Success
         result = self.create_user()
-        self.assertIn('Logged in as <a href="/user/TestUser">TestUser</a>',
+        self.assertIn(b'Logged in as <a href="/user/TestUser">TestUser</a>',
                       result.data)
 
         # Duplicate user
         result = self.create_user()
-        self.assertIn('That username or email is already in use', result.data)
+        self.assertIn(b'That username or email is already in use', result.data)
 
     def test_login(self):
         self.create_user()
 
         # Success
         result = self.login()
-        self.assertIn('Logout', result.data)
+        self.assertIn(b'Logout', result.data)
 
         # Bad user/pass
         result = self.login('Bad', 'User')
-        self.assertIn('Incorrect username or password', result.data)
+        self.assertIn(b'Incorrect username or password', result.data)
 
     def test_logout(self):
         self.create_user()
@@ -119,7 +119,7 @@ class UserManagementTestCase(IdeawheelTests):
 
         # Success
         result = self.logout()
-        self.assertIn('Login', result.data)
+        self.assertIn(b'Login', result.data)
 
     def test_edit_and_view_profile(self):
         self.create_user()
@@ -128,10 +128,10 @@ class UserManagementTestCase(IdeawheelTests):
         self.login()
         result = self.app.get('/user/TestUser')
         expected = [
-            '~TestUser',
-            'thinker of grand ideas',
-            'user',
-            'No information provided'
+            b'~TestUser',
+            b'thinker of grand ideas',
+            b'user',
+            b'No information provided'
         ]
         for e in expected:
             self.assertIn(e, result.data)
@@ -147,10 +147,10 @@ class UserManagementTestCase(IdeawheelTests):
             new_password2=''
         ), follow_redirects=True)
         expected = [
-            'New name',
-            'New artist type',
-            'user',
-            'New blurb'
+            b'New name',
+            b'New artist type',
+            b'user',
+            b'New blurb'
         ]
         for e in expected:
             self.assertIn(e, result.data)
@@ -170,7 +170,7 @@ class UserManagementTestCase(IdeawheelTests):
             new_password='',
             new_password2=''
         ), follow_redirects=True)
-        self.assertIn('Edited by admin', result.data)
+        self.assertIn(b'Edited by admin', result.data)
         self.logout()
 
         # Permission denied editing someone else's profile
@@ -186,7 +186,7 @@ class UserManagementTestCase(IdeawheelTests):
         ), follow_redirects=True)
         self.assertEqual(result.status_code, 403)
         result = self.app.get('/user/Admin')
-        self.assertNotIn('Edited by non-admin', result.data)
+        self.assertNotIn(b'Edited by non-admin', result.data)
         self.logout()
 
         # Permission denied when logged out
@@ -215,7 +215,7 @@ class IdeaStubTestCase(IdeawheelTests):
         result = self.app.post('/stub/create', data=dict(
             stub_text='Sample stub text',
         ), follow_redirects=True)
-        self.assertIn('Stub created', result.data)
+        self.assertIn(b'Stub created', result.data)
 
         self.create_user(username='Staff', password='Staff',
                          email='Admin@example.com')
@@ -225,7 +225,7 @@ class IdeaStubTestCase(IdeawheelTests):
         result = self.app.post('/stub/create', data=dict(
             stub_text='Sample stub text',
         ), follow_redirects=True)
-        self.assertIn('Stub created', result.data)
+        self.assertIn(b'Stub created', result.data)
 
     def test_random_stub(self):
         # This assumes that the randomness of SQLite works, focusing instead on
@@ -233,14 +233,15 @@ class IdeaStubTestCase(IdeawheelTests):
         self.login()
         self.create_stub('A stub without a link')
         result = self.app.get('/idea')
-        self.assertIn('A stub without a link', result.data)
+        self.assertIn(b'A stub without a link', result.data)
 
     def test_random_stub_with_link(self):
         self.login()
         self.create_stub('A stub with a link', link='the link itself')
         result = self.app.get('/idea')
-        self.assertIn('A stub with a link', result.data)
-        self.assertIn('the link itself', result.data)
+        self.assertIn(b'A stub with a link', result.data)
+        self.assertIn(b'the link itself', result.data)
+
 
 if __name__ == '__main__':
     unittest.main()
