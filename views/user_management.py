@@ -1,7 +1,5 @@
-import base64
 import datetime
-import os
-import scrypt
+import bcrypt
 import time
 
 from flask import (
@@ -22,8 +20,8 @@ from models.user import get_user
 def generate_hashword(password, salt=None):
     """Generate salt and password hash for a password and optional salt."""
     if salt is None:
-        salt = os.urandom(64)
-    return scrypt.hash(password.encode('utf8'), salt), salt
+        salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf8'), salt), salt
 
 
 def check_password(username, password):
@@ -36,8 +34,8 @@ def check_password(username, password):
         [username])
     row = result.fetchone()
     if row:
-        stored_hash = base64.b64decode(row[1])
-        stored_salt = base64.b64decode(row[0])
+        stored_hash = row[1]
+        stored_salt = row[0]
         computed_hash = generate_hashword(password, salt=stored_salt)[0]
         return is_equal_time_independent(stored_hash, computed_hash)
     return False
@@ -64,7 +62,7 @@ def is_equal_time_independent(a, b):
 
     result = 0
     for x, y in zip(a, b):
-        result |= ord(x) ^ ord(y)
+        result |= ord(str(x)) ^ ord(str(y))
 
     return result == 0
 
@@ -164,8 +162,8 @@ def register():
                 'insert into auth_users (username, hashword, salt, email) '
                 'values (?, ?, ?, ?)',
                 [username,
-                 base64.b64encode(hashword),
-                 base64.b64encode(salt),
+                 hashword,
+                 salt,
                  email])
             g.db.commit()
             _login(username)
@@ -231,8 +229,8 @@ def edit_user(username):
                 hashword, salt = generate_hashword(new_password)
                 g.db.execute('update auth_users set salt = ?, hashword = ?, '
                              'email = ? where username = ?',
-                             [base64.b64encode(salt),
-                              base64.b64encode(hashword),
+                             [salt,
+                              hashword,
                               user.email,
                               username])
             else:
