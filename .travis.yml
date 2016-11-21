@@ -5,5 +5,5 @@ python:
 install: "pip install -r requirements.txt"
 script:
   - make rawcheck
-after_succes:
+after_success:
   - ./run-coveralls.sh
