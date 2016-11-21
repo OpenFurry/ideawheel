@@ -40,11 +40,11 @@ devfixtures: basedb
 rawcheck: rawlint rawtest
 
 rawtest: $(VIRTUALENV)
-	@$(VIRTUALENV)/bin/coverage erase
-	@$(VIRTUALENV)/bin/nosetests --verbosity=2 --with-coverage --cover-package=ideawheel,models,views
+	coverage erase
+	nosetests --verbosity=2 --with-coverage --cover-package=ideawheel,models,views
 
 rawlint: $(VIRTUALENV)
-	@$(VIRTUALENV)/bin/flake8 --config=tox.ini
+	flake8 --config=tox.ini
 
 clean:
 	rm -rf .tox $(VIRTUALENV)
@@ -52,5 +52,6 @@ clean:
 
 $(VIRTUALENV):
 	virtualenv $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install -r requirements.txt
 
 .PHONY: help deps basedb devfixtures devserver check test lint rawdevserver rawcheck rawtest rawlint clean
